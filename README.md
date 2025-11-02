@@ -16,7 +16,6 @@ This system demonstrates a production-ready multi-agent architecture that:
 - **Integrates with real APIs** to fetch actual data from GitHub and Linear
 - **Provides meaningful responses** with properly formatted data
 
-## Architecture
 
 ### System Flow
 
@@ -287,10 +286,4 @@ If deploying to production, consider adding:
 - ✅ Complete documentation with visual flow diagram
 
 ---
-
-## License
-
-MIT License - Feel free to use and modify as needed.
-
-
 
