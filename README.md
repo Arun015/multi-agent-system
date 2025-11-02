@@ -112,22 +112,9 @@ The diagram shows the complete query processing flow:
 
 ### Getting API Credentials
 
-#### Azure OpenAI
-1. Create an Azure OpenAI resource in Azure Portal
-2. Deploy a model (e.g., GPT-4)
-3. Get your API key from Keys and Endpoint section
-4. Note your endpoint URL and deployment name
-
-#### GitHub Personal Access Token
-1. Go to GitHub Settings → Developer settings → Personal access tokens
-2. Generate new token (classic)
-3. Select scopes: `repo`, `user`, `read:org`
-4. Copy the token
-
-#### Linear API Key
-1. Go to Linear Settings → API
-2. Create a new Personal API Key
-3. Copy the key
+- **Azure OpenAI**: Create resource in Azure Portal, deploy GPT-4, get API key and endpoint
+- **GitHub Token**: Settings → Developer settings → Personal access tokens (scopes: `repo`, `user`, `read:org`)
+- **Linear API Key**: Linear Settings → API → Create Personal API Key
 
 ## Usage
 
@@ -173,43 +160,10 @@ docker run -p 8000:8000 --env-file .env multi-agent-api
 
 ### Example Interactions
 
-#### Clear User Identification
-```
-You: Show me Alice's open pull requests
-Assistant: Alice has 3 open pull request(s):
-
-1. Fix authentication bug in user-service (#42)
-2. Add unit tests for API endpoints (#38)
-3. Update documentation for v2 API (#35)
-```
-
-#### Ambiguous Query (Triggers Clarification)
-```
-You: Show me open pull requests
-Assistant: I can help with that! Which user's github data would you like to see - Alice's or Bob's?
-
-You: Alice
-Assistant: Alice has 3 open pull request(s):
-...
-```
-
-#### Linear Integration
-```
-You: What issues are assigned to Bob in Linear?
-Assistant: Bob has 5 issue(s):
-
-1. [ENG-123] Implement user authentication (In Progress) - Engineering
-   Priority: High
-2. [ENG-145] Fix memory leak in worker (Todo) - Engineering
-   Priority: Urgent
-...
-```
-
-#### Out of Scope Query
-```
-You: What's the weather today?
-Assistant: I cannot answer this question
-```
+**Clear Query**: "Show me Alice's open pull requests" → Lists Alice's 3 PRs  
+**Ambiguous Query**: "Show me open pull requests" → Asks: "Alice's or Bob's?"  
+**Linear Query**: "What issues are assigned to Bob?" → Lists Bob's Linear issues with priority  
+**Out of Scope**: "What's the weather?" → "I cannot answer this question"
 
 ## Project Structure
 
@@ -237,26 +191,18 @@ github_agent/
 └── flow.png                      # System flow diagram
 ```
 
-## Extensibility - Adding More Users
+## Extensibility
 
-The system supports N users through environment variables.
-
-### Adding User 3
-
-Add to your `.env` file:
+**Adding More Users**: System supports N users via environment variables. Add `USER3`, `USER4`, etc. with same pattern:
 ```bash
-GITHUB_TOKEN_USER3=ghp_user3_token_here
+GITHUB_TOKEN_USER3=token_here
 GITHUB_USERNAME_USER3=charlie
-LINEAR_API_KEY_USER3=lin_api_user3_key_here
+LINEAR_API_KEY_USER3=key_here
 LINEAR_USERNAME_USER3=charlie
 USER3_DISPLAY_NAME=Charlie
 ```
 
-The system will load and configure User 3 at startup.
-
-### Adding User 4, 5, 6... N
-
-Continue with the same pattern: `USER4`, `USER5`, etc.
+**Adding New Agents**: Extend `BaseAgent` class and register in orchestrator.
 
 ## Design Decisions
 
@@ -289,64 +235,20 @@ Continue with the same pattern: `USER4`, `USER5`, etc.
 
 ## Supported Queries
 
-### GitHub Agent
-- List repositories: "Show me Alice's repositories"
-- Pull requests: "Show me Bob's open pull requests"
-- Issues: "What issues does Alice have?"
-- Starred repos: "Show me Bob's starred repositories"
-
-### Linear Agent
-- Assigned issues: "What issues are assigned to Alice?"
-- Issues by status: "Show me Bob's in progress issues"
-- High priority: "What are Alice's high priority issues?"
-- Projects: "Show me Bob's Linear projects"
-- Teams: "What teams is Alice on?"
-
-## Assumptions & Limitations
-
-### Assumptions
-1. User 1 = "Alice" and User 2 = "Bob" by default (configurable)
-2. GitHub tokens have appropriate permissions (repo, user access)
-3. Linear users are part of the same organization or have appropriate access
-4. Queries are in English
-
-### Limitations
-1. No persistent conversation history across sessions
-2. No caching of API responses
-3. No retry logic for failed API calls
+**GitHub**: repositories, pull requests, issues, starred repos  
+**Linear**: assigned issues, status filters, priority, projects, teams  
+**Example**: "Show me Alice's repositories", "What are Bob's high priority issues?"
 
 ## Testing
 
-The system includes comprehensive automated tests with **71% code coverage**.
-
-### Test Suite (14 test cases)
-
-**Coverage:**
-- ✅ Health check endpoint
-- ✅ GitHub queries (repos, PRs, issues)
-- ✅ Linear queries (issues, projects, teams)
-- ✅ Clarification handling (ambiguous queries)
-- ✅ Out-of-scope queries (weather, jokes, cooking)
-- ✅ Error handling (empty query validation)
-
-Uses `@parameterized.expand` for clean, maintainable test code.
-
-### Real Data Required
-
-The system requires real GitHub and Linear accounts with actual data:
-1. Create/use 2 GitHub accounts with repos, PRs, or issues
-2. Create/use 2 Linear accounts with issues assigned
-3. Configure environment variables with real credentials
-4. Run tests (see "Option 2: Running Tests" in Usage section)
+**71% Code Coverage** with 14 automated test cases using `@parameterized.expand`:
+- ✅ Health check, GitHub/Linear queries, clarification handling, out-of-scope queries, error handling
+- **Requires**: Real GitHub and Linear accounts with actual data
+- **Run**: `pytest tests/test_api.py --cov=api --cov-report=term-missing -v`
 
 ## Logging
 
-Logs are written to `multi_agent_system.log` and include:
-- Query routing decisions with reasoning
-- User resolution results
-- Agent execution details
-- API call outcomes
-- Error traces
+Logs written to `multi_agent_system.log`: routing decisions, user resolution, agent execution, API outcomes, error traces
 
 ## Assumptions & Limitations
 
@@ -377,27 +279,14 @@ If deploying to production, consider adding:
 
 ## 📋 Submission Information
 
-**Assignment**: StackGen AI Dev Take-Home Assessment  
-**Time Spent**: ~6 hours  
-**Language**: Python 3.12+  
-**Test Coverage**: 71% (14 automated tests)
+**Assignment**: StackGen AI Dev Take-Home Assessment | **Time**: ~6 hours | **Language**: Python 3.12+ | **Coverage**: 71%
 
-### What Was Built
-
-This multi-agent system demonstrates:
-- ✅ Strong architectural design with layered architecture
-- ✅ Clean, maintainable code with proper separation of concerns
+**Key Achievements**:
+- ✅ LLM-powered routing with Azure GPT-4 + LangChain
 - ✅ Real API integration (GitHub REST, Linear GraphQL)
-- ✅ Comprehensive testing with FastAPI TestClient
-- ✅ Production-ready patterns (Docker, logging, extensibility)
+- ✅ FastAPI REST API with comprehensive testing
+- ✅ Production-ready (Docker, logging, layered architecture)
 - ✅ Complete documentation with visual flow diagram
-
-### Time Breakdown
-- **Setup & Planning**: 30 minutes
-- **Core Implementation**: 2.5 hours (Config, Agents, Router, Orchestrator)
-- **Integration & Testing**: 1.5 hours (API integration, test suite)
-- **Documentation**: 1 hour (README, flow diagram)
-- **Docker & Optimization**: 30 minutes
 
 ---
 
