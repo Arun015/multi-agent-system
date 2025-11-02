@@ -20,10 +20,6 @@ This system demonstrates a production-ready multi-agent architecture that:
 
 ### System Flow
 
-![System Flow Diagram](flow.png)
-
-The diagram shows the complete query processing flow:
-
 1. **User Query** - User sends a natural language query
 2. **LLM Router** - Azure GPT-4 analyzes intent and extracts user identity
 3. **Route Decision** - Determines which agent to use (GitHub/Linear) or asks for clarification
