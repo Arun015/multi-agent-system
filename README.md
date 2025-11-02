@@ -1,7 +1,7 @@
 # Multi-Agent System for GitHub and Linear
 
 > **Submission for StackGen AI Dev Take-Home Assessment**  
-> Python 3.12+ | 71% Test Coverage | Docker Ready
+> Python 3.12+ | Automated Testing | Docker Ready
 
 A production-ready multi-agent orchestration system that intelligently routes user queries to specialized agents (GitHub and Linear) using LLM-powered routing with Azure OpenAI GPT-4.
 
@@ -46,7 +46,7 @@ The diagram shows the complete query processing flow:
 | **Out-of-Scope Handling** | ✅ | Returns "I cannot answer this question" |
 | **Real API Integration** | ✅ | GitHub REST API and Linear GraphQL API |
 | **REST API** | ✅ | FastAPI with Swagger documentation |
-| **Testing** | ✅ | 71% coverage with 14 automated tests |
+| **Testing** | ✅ | 14 automated tests with parameterized cases |
 | **Logging** | ✅ | Comprehensive structured logging |
 | **Docker Support** | ✅ | Optimized Alpine image |
 | **Extensibility** | ✅ | Dynamic user loading, easy to add agents |
@@ -145,8 +145,8 @@ curl -X POST http://localhost:8000/query \
 # Run all tests (no server needed, uses TestClient)
 python -m unittest tests/test_api.py -v
 
-# Run with coverage (71% coverage)
-pytest tests/test_api.py --cov=api --cov-report=term-missing --no-cov-on-fail -v
+# Run with coverage report
+pytest tests/test_api.py --cov=api --cov-report=term-missing -v
 ```
 
 **Note**: Tests use FastAPI's TestClient for in-process testing. No separate server needed.
@@ -183,7 +183,7 @@ github_agent/
 │       └── agents/               # Agent implementations
 │           ├── langchain_github_agent.py
 │           └── linear_agent.py
-├── tests/test_api.py             # Integration tests (71% coverage)
+├── tests/test_api.py             # Integration tests (14 test cases)
 ├── config.py                     # Configuration
 ├── run_server.py                 # Server entry point
 ├── requirements.txt              # Dependencies
@@ -241,10 +241,10 @@ USER3_DISPLAY_NAME=Charlie
 
 ## Testing
 
-**71% Code Coverage** with 14 automated test cases using `@parameterized.expand`:
+**14 Automated Test Cases** using `@parameterized.expand`:
 - ✅ Health check, GitHub/Linear queries, clarification handling, out-of-scope queries, error handling
 - **Requires**: Real GitHub and Linear accounts with actual data
-- **Run**: `pytest tests/test_api.py --cov=api --cov-report=term-missing -v`
+- **Run**: `python -m unittest tests/test_api.py -v`
 
 ## Logging
 
@@ -279,7 +279,7 @@ If deploying to production, consider adding:
 
 ## 📋 Submission Information
 
-**Assignment**: StackGen AI Dev Take-Home Assessment | **Time**: ~6 hours | **Language**: Python 3.12+ | **Coverage**: 71%
+**Assignment**: StackGen AI Dev Take-Home Assessment | **Time**: ~6 hours | **Language**: Python 3.12+
 
 **Key Achievements**:
 - ✅ LLM-powered routing with Azure GPT-4 + LangChain
