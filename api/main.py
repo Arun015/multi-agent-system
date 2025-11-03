@@ -1,18 +1,9 @@
-"""
-Main FastAPI application with layered architecture.
-
-Architecture:
-- Routes: HTTP endpoints (api/routes/)
-- Services: Business logic and orchestration (api/services/)
-- DTOs: Data Transfer Objects for API contracts (api/dto/)
-- Core: Domain logic (orchestrator/, agents/)
-"""
+"""Main FastAPI application with layered architecture."""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from api.routes import router
 
-# Set up logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -20,7 +11,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
 app = FastAPI(
     title="Multi-Agent System API",
     description="""
@@ -45,10 +35,9 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -68,6 +57,5 @@ async def shutdown_event():
     logger.info("Shutting down Multi-Agent System API")
 
 
-# Include router
 app.include_router(router)
 

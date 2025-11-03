@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Service instance (singleton pattern)
 _query_service = None
 
 
@@ -21,16 +20,10 @@ def get_query_service() -> QueryService:
     return _query_service
 
 
-# Health Check
 @router.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """
-    Health check endpoint.
-    
-    Returns system health status and configuration info.
-    """
+    """Health check endpoint."""
     try:
-        # Check if Azure OpenAI is configured
         llm_enabled = bool(
             os.getenv('AZURE_OPENAI_API_KEY') and 
             os.getenv('AZURE_OPENAI_ENDPOINT') and 
@@ -47,28 +40,14 @@ async def health_check():
         raise HTTPException(status_code=503, detail="Health check failed")
 
 
-# Query Endpoint
 @router.post("/query", response_model=QueryResponse, tags=["Query"])
 async def process_query(
     request: QueryRequest,
     service: QueryService = Depends(get_query_service)
 ):
-    """
-    Process a user query through the multi-agent system.
-    
-    Args:
-        request: Query request containing the user's query text
-        service: QueryService instance (injected)
-        
-    Returns:
-        Query response with agent's answer
-        
-    Raises:
-        HTTPException: If processing fails
-    """
+    """Process a user query through the multi-agent system."""
     try:
         response = service.process_query(query=request.query)
-        
         return QueryResponse(response=response)
     except ValueError as e:
         logger.warning(f"Invalid query: {e}")

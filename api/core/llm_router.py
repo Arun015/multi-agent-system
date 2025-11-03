@@ -38,21 +38,13 @@ class LLMRouter:
     
     def __init__(self):
         """Initialize the LLM router with Azure OpenAI."""
-        # Check for Azure OpenAI configuration
         azure_api_key = os.getenv('AZURE_OPENAI_API_KEY')
         azure_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
         azure_deployment = os.getenv('AZURE_OPENAI_DEPLOYMENT')
         
         if not all([azure_api_key, azure_endpoint, azure_deployment]):
-            raise ValueError(
-                "Azure OpenAI configuration required. Please set in .env:\n"
-                "- AZURE_OPENAI_API_KEY\n"
-                "- AZURE_OPENAI_ENDPOINT\n"
-                "- AZURE_OPENAI_DEPLOYMENT\n"
-                "- AZURE_OPENAI_API_VERSION (optional, defaults to 2024-02-15-preview)"
-            )
+            raise ValueError("Azure OpenAI configuration required")
         
-        # Initialize Azure OpenAI with LangChain
         from langchain_openai import AzureChatOpenAI
         
         self.llm = AzureChatOpenAI(
@@ -60,19 +52,16 @@ class LLMRouter:
             azure_endpoint=azure_endpoint,
             api_key=azure_api_key,
             api_version=os.getenv('AZURE_OPENAI_API_VERSION', '2024-02-15-preview'),
-            temperature=0,  # Deterministic for routing
+            temperature=0,
         )
         
-        # Set up structured output parser
         self.parser = PydanticOutputParser(pydantic_object=RoutingDecision)
         
-        # Create the routing prompt
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", self._get_system_prompt()),
             ("user", "{query}")
         ])
         
-        # Create the chain
         self.chain = self.prompt | self.llm | self.parser
     
     def _get_system_prompt(self) -> str:
@@ -110,30 +99,17 @@ Important:
 {format_instructions}"""
     
     def route(self, query: str) -> Dict[str, Any]:
-        """
-        Route a query using LLM reasoning.
-        
-        Args:
-            query: The user's query
-            
-        Returns:
-            Dictionary with routing decision
-        """
+        """Route a query using LLM reasoning."""
         try:
-            # Get format instructions for structured output
             format_instructions = self.parser.get_format_instructions()
             
-            # Invoke the chain
             result: RoutingDecision = self.chain.invoke({
                 "query": query,
                 "format_instructions": format_instructions
             })
             
-            logger.info(f"LLM Routing - Agent: {result.agent}, "
-                       f"Confidence: {result.confidence}, "
-                       f"Reasoning: {result.reasoning}")
+            logger.info(f"LLM Routing - Agent: {result.agent}, Confidence: {result.confidence}")
             
-            # Convert to dict for consistency
             return {
                 'agent': result.agent if result.agent != 'out_of_scope' else None,
                 'confidence': result.confidence,

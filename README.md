@@ -273,7 +273,6 @@ If deploying to production, consider adding:
 - **Secrets Management**: AWS Secrets Manager or HashiCorp Vault
 
 ---
-
 ## 📋 Submission Information
 
 **Assignment**: StackGen AI Dev Take-Home Assessment | **Time**: ~6 hours | **Language**: Python 3.12+
@@ -284,6 +283,3 @@ If deploying to production, consider adding:
 - ✅ FastAPI REST API with comprehensive testing
 - ✅ Production-ready (Docker, logging, layered architecture)
 - ✅ Complete documentation with visual flow diagram
-
----
-

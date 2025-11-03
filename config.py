@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import Optional
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 
@@ -21,11 +20,9 @@ class Config:
     """Main configuration class."""
     
     def __init__(self):
-        # Load all configured users
         self.users = {}
         self.display_name_to_user = {}
         
-        # Load users from environment variables
         user_index = 1
         while True:
             github_username = os.getenv(f'GITHUB_USERNAME_USER{user_index}')
@@ -47,7 +44,6 @@ class Config:
             
             user_index += 1
         
-        # Set shortcuts for common access patterns
         if 'user1' in self.users:
             self.user1 = self.users['user1']
         if 'user2' in self.users:
@@ -76,19 +72,17 @@ class Config:
         """Validate configuration and return list of errors."""
         errors = []
         
-        # Check for Azure OpenAI configuration (required for LLM-powered system)
         if not os.getenv('AZURE_OPENAI_API_KEY'):
-            errors.append("AZURE_OPENAI_API_KEY is required for LLM-powered routing and agents")
+            errors.append("AZURE_OPENAI_API_KEY is required")
         if not os.getenv('AZURE_OPENAI_ENDPOINT'):
-            errors.append("AZURE_OPENAI_ENDPOINT is required for LLM-powered routing and agents")
+            errors.append("AZURE_OPENAI_ENDPOINT is required")
         if not os.getenv('AZURE_OPENAI_DEPLOYMENT'):
-            errors.append("AZURE_OPENAI_DEPLOYMENT is required for LLM-powered routing and agents")
+            errors.append("AZURE_OPENAI_DEPLOYMENT is required")
         
         if not self.users:
-            errors.append("No users configured. At least one user is required.")
+            errors.append("No users configured")
             return errors
         
-        # Validate each user's credentials
         for user_id, user_config in self.users.items():
             if not user_config.github_token:
                 errors.append(f"GITHUB_TOKEN_{user_id.upper()} is not set")
@@ -98,6 +92,5 @@ class Config:
         return errors
 
 
-# Global config instance
 config = Config()
 

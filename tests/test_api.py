@@ -1,8 +1,4 @@
-"""
-Integration tests for the multi-agent system API.
-Uses parameterized tests to validate different query types.
-
-"""
+"""Integration tests for the multi-agent system API."""
 import unittest
 from fastapi.testclient import TestClient
 from parameterized import parameterized
@@ -14,7 +10,6 @@ class TestMultiAgentAPI(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        """Initialize test client."""
         cls.client = TestClient(app)
     
     def test_health_check(self):
@@ -51,7 +46,6 @@ class TestMultiAgentAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("response", data)
-        # Response should mention the user or their data
         response_lower = data["response"].lower()
         self.assertTrue(
             expected_user in data["response"] or 
@@ -59,7 +53,7 @@ class TestMultiAgentAPI(unittest.TestCase):
             "project" in response_lower or
             "team" in response_lower or
             "linear" in response_lower or
-            "?" in data["response"]  # May ask for clarification
+            "?" in data["response"]
         )
     
     @parameterized.expand([
@@ -73,10 +67,8 @@ class TestMultiAgentAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("response", data)
-        # Should ask for clarification
         response_text = data["response"]
         self.assertIn(expected_symbol, response_text)
-        # Should mention both users
         has_users = any(user in response_text for user in expected_users)
         self.assertTrue(has_users)
     
@@ -91,7 +83,6 @@ class TestMultiAgentAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("response", data)
-        # LLM may either reject or ask for clarification on unclear queries
         response_lower = data["response"].lower()
         has_rejection_or_clarification = (
             "cannot answer" in response_lower or
@@ -99,8 +90,7 @@ class TestMultiAgentAPI(unittest.TestCase):
             "github or linear" in response_lower or
             "?" in data["response"]
         )
-        self.assertTrue(has_rejection_or_clarification, 
-                       f"Expected out-of-scope handling but got: {data['response']}")
+        self.assertTrue(has_rejection_or_clarification)
     
     def test_empty_query(self):
         """Test empty query validation."""
@@ -109,6 +99,5 @@ class TestMultiAgentAPI(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # Run tests with verbose output
     unittest.main(verbosity=2)
 

@@ -13,14 +13,12 @@ class Orchestrator:
     
     def __init__(self):
         """Initialize the orchestrator with LLM-powered components."""
-        # Use LLM-powered routing
         from .llm_router import LLMRouter
         self.router = LLMRouter()
-        logger.info("Initialized with LLM-powered routing (GPT-4)")
+        logger.info("Initialized with LLM-powered routing")
         
         self.user_resolver = UserResolver()
         
-        # Initialize LangChain agents
         from .agents.langchain_github_agent import LangChainGitHubAgent
         self.github_agent = LangChainGitHubAgent()
         logger.info("Initialized LangChain GitHub agent")
@@ -28,34 +26,21 @@ class Orchestrator:
         self.linear_agent = LinearAgent()
         logger.info("Initialized Linear agent")
         
-        # State for handling clarifications
         self.pending_clarification = None
     
     def process_query(self, query: str) -> str:
-        """
-        Process a user query through the multi-agent system.
-        
-        Args:
-            query: The user's query
-            
-        Returns:
-            Response string
-        """
-        # Check if this is a clarification response
+        """Process a user query through the multi-agent system."""
         if self.pending_clarification:
             return self._handle_clarification_response(query)
         
-        # Route to determine which agent
         routing_result = self.router.route(query)
         agent_type = routing_result['agent']
         
         logger.info(f"Routing result: {routing_result}")
         
-        # Handle out-of-scope queries
         if agent_type is None:
             return "I cannot answer this question"
         
-        # Check if agent routing is ambiguous
         if routing_result.get('ambiguous'):
             self.pending_clarification = {
                 'agent_type': None,
@@ -65,26 +50,21 @@ class Orchestrator:
             }
             return "Which platform? GitHub or Linear?"
         
-        # Resolve which user
         user_result = self.user_resolver.resolve(query)
         user_id = user_result.get('user_id')
         
         logger.info(f"User resolution result: {user_result}")
         
-        # Handle ambiguous user
         if user_id is None or user_result.get('clarification_needed'):
-            # Store pending clarification state
             self.pending_clarification = {
                 'agent_type': agent_type,
                 'original_query': query,
                 'routing_result': routing_result
             }
             
-            # Get clarification message
             agent_name = 'GitHub' if agent_type == 'github' else 'Linear'
             return self.user_resolver.get_clarification_message(agent_name)
         
-        # Execute the query with the appropriate agent
         return self._execute_agent(agent_type, query, user_id, routing_result)
     
     def _handle_clarification_response(self, response: str) -> str:
@@ -92,7 +72,6 @@ class Orchestrator:
         if not self.pending_clarification:
             return "I cannot answer this question"
         
-        # Check if this is agent clarification
         if self.pending_clarification.get('ambiguous_agent'):
             response_lower = response.lower()
             if 'github' in response_lower:
@@ -102,39 +81,31 @@ class Orchestrator:
             else:
                 return "I can help with that! Are you asking about GitHub or Linear?"
             
-            # Update pending clarification with resolved agent
             self.pending_clarification['agent_type'] = agent_type
             self.pending_clarification['ambiguous_agent'] = False
             
-            # Now resolve user for this agent
             original_query = self.pending_clarification['original_query']
             user_result = self.user_resolver.resolve(original_query)
             user_id = user_result.get('user_id')
             
             if user_id is None or user_result.get('clarification_needed'):
-                # Still need user clarification
                 agent_name = 'GitHub' if agent_type == 'github' else 'Linear'
                 return self.user_resolver.get_clarification_message(agent_name)
             else:
-                # Both resolved, execute
                 self.pending_clarification = None
                 routing_result = {'agent': agent_type}
                 return self._execute_agent(agent_type, original_query, user_id, routing_result)
         
-        # Resolve the user from clarification response
         user_id = self.user_resolver.resolve_clarification_response(response)
         
         if user_id is None:
-            # Still unclear, ask again
             agent_name = 'GitHub' if self.pending_clarification['agent_type'] == 'github' else 'Linear'
             return self.user_resolver.get_clarification_message(agent_name)
         
-        # Execute the original query with the clarified user
         original_query = self.pending_clarification['original_query']
         agent_type = self.pending_clarification['agent_type']
         routing_result = self.pending_clarification['routing_result']
         
-        # Clear pending clarification
         self.pending_clarification = None
         
         return self._execute_agent(agent_type, original_query, user_id, routing_result)
