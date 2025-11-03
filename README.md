@@ -5,7 +5,7 @@
 
 ## 🎥 Video Demo
 
-**Watch the system in action:** [Click here to view demo](ADD_YOUR_DRIVE_LINK_HERE)
+**Watch the system in action:** [Click here to view demo](https://drive.google.com/file/d/1yl0sXtImJ-5NmaowzvE0itwNmmXNsyi3/view?usp=sharing)
 
 ![System Flow Diagram](flow.png)
 
