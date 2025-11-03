@@ -3,6 +3,10 @@
 > **Submission for StackGen AI Dev Take-Home Assessment**  
 > Python 3.12+ | Automated Testing | Docker Ready
 
+## 🎥 Video Demo
+
+**Watch the system in action:** [Click here to view demo](ADD_YOUR_DRIVE_LINK_HERE)
+
 ![System Flow Diagram](flow.png)
 
 A production-ready multi-agent orchestration system that intelligently routes user queries to specialized agents (GitHub and Linear) using LLM-powered routing with Azure OpenAI GPT-4.
