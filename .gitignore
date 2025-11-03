@@ -49,3 +49,8 @@ htmlcov/
 coverage.xml
 *.cover
 
+# Large video files
+*.mov
+*.mp4
+*.avi
+
