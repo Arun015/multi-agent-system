@@ -169,7 +169,7 @@ class TestLangChainGitHubAgent(unittest.TestCase):
         self.assertIsNotNone(agent.llm)
         self.assertIsNotNone(agent.tools)
         self.assertIsNotNone(agent.agent_executor)
-        self.assertIsNotNone(agent.base_agent)
+        self.assertEqual(agent.api_base, "https://api.github.com")
     
     @patch('api.core.agents.langchain_github_agent.AgentExecutor')
     @patch('api.core.agents.langchain_github_agent.AzureChatOpenAI')
