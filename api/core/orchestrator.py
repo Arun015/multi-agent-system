@@ -1,9 +1,8 @@
 """Main orchestrator for multi-agent system."""
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 import logging
-import os
 from .user_resolver import UserResolver
-from .agents import GitHubAgent, LinearAgent
+from .agents import LinearAgent
 
 logger = logging.getLogger(__name__)
 
