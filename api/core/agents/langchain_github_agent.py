@@ -22,7 +22,7 @@ class LangChainGitHubAgentConfig:
     azure_api_version: str = "2024-02-15-preview"
     temperature: float = 0
     verbose: bool = True
-    max_iterations: int = 5
+    max_iterations: int = 3
     user_configs: Optional[Dict[str, UserConfig]] = None
     
     def add_user(self, user_id: str, username: str, display_name: str, github_token: str) -> 'LangChainGitHubAgentConfig':
